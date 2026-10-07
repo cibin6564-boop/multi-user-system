@@ -748,15 +748,9 @@
 
 
         function getAccessibleRecords() {
-            if (!currentUser) return [];
-            if (currentUser.role === 'admin') {
-                return records;
-            } else if (currentUser.role === 'leader') {
-                return records.filter(r => r.group === currentUser.group);
-            } else {
-                return records.filter(r => r.creator === currentUser.username);
-            }
-        }
+    if (!currentUser) return [];
+    return records;
+}
 
         function renderStats() {
             const accessible = getAccessibleRecords();
