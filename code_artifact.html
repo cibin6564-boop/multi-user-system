@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重粉管理系统</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            900: '#090d16',
+                            800: '#10172a',
+                            700: '#1e293b',
+                            600: '#334155',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #10172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="h-full bg-dark-900 text-gray-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <div id="app" class="min-h-full flex flex-col">
+        
+        <!-- ================= LOGIN SCREEN ================= -->
+        <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-dark-900 bg-opacity-95 backdrop-blur-xl px-4">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15)_0,transparent_70%)]"></div>
+            
+            <div class="relative w-full max-w-md bg-dark-800 border border-gray-700/60 rounded-2xl shadow-2xl overflow-hidden p-8">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-2xl mb-4 shadow-inner">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">重粉管理系统</h1>
+                    <p class="text-sm text-gray-400 mt-1">请选择您的账号登录系统 (默认密码: 111111)</p>
+                </div>
+
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">选择登录账号</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-indigo-400">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </span>
+                            <select id="login-account-select" required class="w-full pl-10 pr-4 py-3 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                                <option value="" disabled selected>-- 请选择账号 --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-indigo-400">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <input type="password" id="login-password" required value="111111" class="w-full pl-10 pr-12 py-3 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" placeholder="请输入密码">
+                            <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-200">
+                                <i id="toggle-pwd-icon" class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="remember-me" class="w-4 h-4 rounded bg-dark-700 border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                            <span class="ml-2 text-gray-300">记住账号密码</span>
+                        </label>
+                        <span class="text-xs text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">默认密码: 111111</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/25 transition duration-200 flex items-center justify-center space-x-2">
+                        <span>登录系统</span>
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                </form>
+
+                <div id="login-error" class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 text-center hidden">
+                    账号或密码错误，请重试！
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= MAIN APP INTERFACE ================= -->
+        <div id="main-interface" class="flex-1 flex flex-col hidden">
+            
+            <!-- Top Navbar -->
+            <header class="bg-dark-800 border-b border-gray-700/60 h-16 px-6 flex items-center justify-between sticky top-0 z-30 shadow-md">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-white tracking-wide">重粉管理系统</h2>
+                        <p class="text-xs text-gray-400 flex items-center space-x-2">
+                            <span id="nav-role-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">身份</span>
+                            <span id="nav-username" class="font-medium text-gray-300">用户名</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="openChangePasswordModal()" class="px-3 py-2 bg-dark-700 hover:bg-dark-600 border border-gray-600 rounded-lg text-xs font-medium text-gray-300 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-key text-indigo-400"></i>
+                        <span>修改本人密码</span>
+                    </button>
+                    <button onclick="handleLogout()" class="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg text-xs font-medium text-red-400 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-power-off"></i>
+                        <span>退出登录</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Top Real-time Stats Bar -->
+            <div class="bg-dark-800/80 border-b border-gray-700/60 px-6 py-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-dark-700/50 border border-gray-600/50 rounded-xl p-4 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl">
+                        <i class="fa-solid fa-calendar-day"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-400 font-medium block">今日输入数据量</span>
+                        <span id="stat-today-count" class="text-2xl font-bold text-white">0</span>
+                    </div>
+                </div>
+
+                <div class="bg-dark-700/50 border border-gray-600/50 rounded-xl p-4 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-400 font-medium block">总输入数据量</span>
+                        <span id="stat-total-count" class="text-2xl font-bold text-white">0</span>
+                    </div>
+                </div>
+
+                <div class="bg-dark-700/50 border border-gray-600/50 rounded-xl p-4 flex items-center space-x-4 md:col-span-2 justify-between">
+                    <div>
+                        <span class="text-xs text-gray-400 font-medium block">当前数据权限视图范围</span>
+                        <span id="stat-scope-desc" class="text-sm font-semibold text-indigo-300 mt-1 block">全局全量数据</span>
+                    </div>
+                    <div id="quick-action-buttons" class="flex items-center space-x-2">
+                        <!-- Populated dynamically based on role -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Layout Grid (Dynamic based on role: Employee has entry form on left, Leaders/Admin have full tables or management panels) -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                
+                <!-- Left Sidebar: Entry Form (ONLY for Employees) -->
+                <aside id="employee-entry-sidebar" class="w-full md:w-96 bg-dark-800 border-r border-gray-700/60 p-6 flex flex-col overflow-y-auto shrink-0 hidden">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                            <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
+                            <span>数据录入工作台</span>
+                        </h3>
+                        <span class="text-[11px] text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">专属录入</span>
+                    </div>
+
+                    <form id="data-entry-form" onsubmit="handleDataSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">归属账号 (自动锁定)</label>
+                            <input type="text" id="entry-creator" disabled class="w-full px-3.5 py-2.5 bg-dark-900 border border-gray-700 rounded-xl text-sm text-indigo-400 font-semibold cursor-not-allowed">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">客户名字</label>
+                            <input type="text" id="entry-customer" required class="w-full px-3.5 py-2.5 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="例如：张先生 / 游戏粉">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">手机号码 (全局查重)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-indigo-400">
+                                    <i class="fa-solid fa-phone"></i>
+                                </span>
+                                <input type="text" id="entry-phone" required class="w-full pl-9 pr-3.5 py-2.5 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="输入手机号/WhatsApp/TG">
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-1">系统将自动全局查重，重复号码将被拦截。</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">渠道商选择</label>
+                            <select id="entry-channel" required class="w-full px-3.5 py-2.5 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">所属群</label>
+                            <input type="text" id="entry-group-chat" required class="w-full px-3.5 py-2.5 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="例如：重粉互动群01">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">录入时间 (自动生成)</label>
+                            <input type="text" id="entry-time" disabled class="w-full px-3.5 py-2.5 bg-dark-900 border border-gray-700 rounded-xl text-sm text-gray-400 font-mono cursor-not-allowed">
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-xl shadow-md transition flex items-center justify-center space-x-2 text-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>提交并保存数据</span>
+                        </button>
+                    </form>
+                </aside>
+
+                <!-- Right Main Content / Data Table & Management Panels -->
+                <main class="flex-1 flex flex-col bg-dark-900 overflow-hidden">
+                    
+                    <!-- Search & Controls Bar -->
+                    <div class="p-6 bg-dark-800/40 border-b border-gray-700/60 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                                    <i class="fa-solid fa-search"></i>
+                                </span>
+                                <input type="text" id="search-input" oninput="renderDataTable()" class="w-full md:w-80 pl-9 pr-4 py-2.5 bg-dark-700 border border-gray-600 rounded-xl text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="搜索客户名、号码、渠道商、所属群...">
+                            </div>
+                            <button onclick="renderDataTable()" class="px-4 py-2.5 bg-dark-700 hover:bg-dark-600 border border-gray-600 rounded-xl text-sm font-medium text-gray-300 transition">
+                                <i class="fa-solid fa-rotate"></i> 刷新
+                            </button>
+                        </div>
+
+                        <!-- Action buttons for admin (Export data, Channel Manager, Logs, Account Manager) -->
+                        <div id="admin-action-buttons" class="flex items-center space-x-3 hidden">
+                            <button onclick="openChannelManagerModal()" class="px-3.5 py-2.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 rounded-xl text-xs font-medium text-purple-300 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-network-wired"></i>
+                                <span>渠道商管理</span>
+                            </button>
+                            <button onclick="openLogsModal()" class="px-3.5 py-2.5 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 rounded-xl text-xs font-medium text-indigo-300 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>修改日志明细</span>
+                            </button>
+                            <button onclick="openAccountManagerModal()" class="px-3.5 py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 rounded-xl text-xs font-medium text-emerald-300 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-users-gear"></i>
+                                <span>账号与团队管理</span>
+                            </button>
+                            <button onclick="exportDataToCSV()" class="px-3.5 py-2.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 rounded-xl text-xs font-medium text-amber-300 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>导出数据</span>
+                            </button>
+                        </div>
+
+                        <!-- Action buttons for Leaders (Manage Team Members) -->
+                        <div id="leader-action-buttons" class="flex items-center space-x-3 hidden">
+                            <button onclick="openTeamManagerModal()" class="px-3.5 py-2.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 rounded-xl text-xs font-medium text-purple-300 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-users"></i>
+                                <span id="leader-team-btn-text">管理小组成员</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Data Table Container -->
+                    <div class="flex-1 overflow-x-auto p-6">
+                        <div class="inline-block min-w-full align-middle bg-dark-800 rounded-2xl border border-gray-700/60 shadow-xl overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-dark-700/50">
+                                    <tr>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">序号</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">客户名称</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">手机号码</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">渠道商</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">所属群</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">录入员工</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">所属组别</th>
+                                        <th scope="col" class="py-3.5 px-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">录入时间</th>
+                                        <th scope="col" class="py-3.5 px-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider" id="table-action-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table-body" class="divide-y divide-gray-700/60 text-sm text-gray-300">
+                                    <!-- Rows populated via JS -->
+                                </tbody>
+                            </table>
+                            <div id="table-empty-state" class="hidden py-16 text-center text-gray-500">
+                                <i class="fa-solid fa-folder-open text-4xl mb-3"></i>
+                                <p class="text-sm">暂无符合条件的数据记录</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- ================= MODALS ================= -->
+
+        <!-- Change Password Modal -->
+        <div id="password-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+            <div class="bg-dark-800 border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-key text-indigo-400"></i>
+                        <span>修改本人密码</span>
+                    </h3>
+                    <button onclick="closeChangePasswordModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handlePasswordChangeSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">新密码</label>
+                        <input type="password" id="new-password-input" required class="w-full px-3 py-2 bg-dark-700 border border-gray-600 rounded-xl text-sm text-white focus:ring-2 focus:ring-indigo-500" placeholder="请输入新密码">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">确认新密码</label>
+                        <input type="password" id="confirm-password-input" required class="w-full px-3 py-2 bg-dark-700 border border-gray-600 rounded-xl text-sm text-white focus:ring-2 focus:ring-indigo-500" placeholder="请再次输入新密码">
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-xs font-medium rounded-xl">取消</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl">确认修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Channel Manager Modal (Admin Only) -->
+        <div id="channel-manager-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+            <div class="bg-dark-800 border border-gray-700 rounded-2xl w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden">
+                <div class="p-5 border-b border-gray-700 flex items-center justify-between bg-dark-700/40">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-network-wired text-purple-400"></i>
+                            <span>渠道商实时管理与添加</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-0.5">新增或修改渠道商将实时同步全系统录入下拉菜单</p>
+                    </div>
+                    <button onclick="closeChannelManagerModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto flex-1 space-y-6">
+                    <!-- Add Channel Form -->
+                    <form onsubmit="handleAddNewChannel(event)" class="flex space-x-3">
+                        <input type="text" id="new-channel-name" required class="flex-1 px-3.5 py-2.5 bg-dark-700 border border-gray-600 rounded-xl text-sm text-white focus:ring-2 focus:ring-purple-500" placeholder="输入新渠道商名称（例如：TikTok海外01）">
+                        <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-xl transition">添加渠道</button>
+                    </form>
+
+                    <!-- Channel List Grid -->
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3">当前所有渠道商列表 (支持删除自定义)</h4>
+                        <div id="channel-list-container" class="grid grid-cols-2 md:grid-cols-3 gap-2.5 max-h-60 overflow-y-auto pr-2">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-dark-700/40 flex justify-end">
+                    <button onclick="closeChannelManagerModal()" class="px-5 py-2 bg-dark-600 hover:bg-dark-500 text-white text-xs font-medium rounded-xl">关闭窗口</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Modal (Admin Only) -->
+        <div id="logs-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+            <div class="bg-dark-800 border border-gray-700 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden">
+                <div class="p-5 border-b border-gray-700 flex items-center justify-between bg-dark-700/40">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i>
+                            <span>系统修改日志明细</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-0.5">记录所有账号改名、密码重置及数据删除等关键操作</p>
+                    </div>
+                    <button onclick="closeLogsModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto flex-1">
+                    <div class="space-y-3" id="logs-list-container">
+                        <!-- Populated via JS -->
+                    </div>
+                    <div id="logs-empty-state" class="hidden py-12 text-center text-gray-500">
+                        <i class="fa-solid fa-clipboard-list text-3xl mb-2"></i>
+                        <p class="text-xs">暂无操作日志记录</p>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-dark-700/40 flex justify-end">
+                    <button onclick="closeLogsModal()" class="px-5 py-2 bg-dark-600 hover:bg-dark-500 text-white text-xs font-medium rounded-xl">关闭窗口</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account & Team Manager Modal (Admin Only) -->
+        <div id="account-manager-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+            <div class="bg-dark-800 border border-gray-700 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden">
+                <div class="p-5 border-b border-gray-700 flex items-center justify-between bg-dark-700/40">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-users-gear text-emerald-400"></i>
+                            <span>系统账号与团队管理 (可添加账号/改名/重置密码)</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-0.5">管理员可自由添加新的组长或员工账号，或修改现有账号名称与重置密码</p>
+                    </div>
+                    <button onclick="closeAccountManagerModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto flex-1 space-y-6">
+                    <!-- Add New Account Form -->
+                    <div class="bg-dark-700/50 p-4 rounded-xl border border-gray-600/60">
+                        <h4 class="text-xs font-semibold text-white uppercase tracking-wider mb-3">添加新的组长或员工账号</h4>
+                        <form onsubmit="handleAddNewAccount(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <select id="new-acc-role" required class="px-3 py-2 bg-dark-700 border border-gray-600 rounded-xl text-sm text-white">
+                                <option value="leader">组长账号</option>
+                                <option value="employee">员工账号</option>
+                            </select>
+                            <select id="new-acc-group" required class="px-3 py-2 bg-dark-700 border border-gray-600 rounded-xl text-sm text-white">
+                                <option value="第A组">第A组</option>
+                                <option value="第B组">第B组</option>
+                                <option value="第C组">第C组</option>
+                                <option value="第D组">第D组</option>
+                            </select>
+                            <input type="text" id="new-acc-username" required class="px-3 py-2 bg-dark-700 border border-gray-600 rounded-xl text-sm text-white" placeholder="账号名称 (如: 组长E 或 E1)">
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition">确认添加账号</button>
+                        </form>
+                    </div>
+
+                    <!-- Accounts List Grid -->
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3">全部系统账号一览</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="admin-account-list-grid">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-dark-700/40 flex justify-end">
+                    <button onclick="closeAccountManagerModal()" class="px-5 py-2 bg-dark-600 hover:bg-dark-500 text-white text-xs font-medium rounded-xl">关闭窗口</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Manager Modal (Leader Only) -->
+        <div id="team-manager-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+            <div class="bg-dark-800 border border-gray-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden">
+                <div class="p-5 border-b border-gray-700 flex items-center justify-between bg-dark-700/40">
+                    <div>
+                        <h3 id="team-modal-title" class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-users text-purple-400"></i>
+                            <span>小组名下员工管理</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-0.5">组长可修改名下员工名字及重置密码 (默认密码: 111111)</p>
+                    </div>
+                    <button onclick="closeTeamManagerModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto flex-1">
+                    <div class="space-y-3" id="team-members-list-container">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-dark-700/40 flex justify-end">
+                    <button onclick="closeTeamManagerModal()" class="px-5 py-2 bg-dark-600 hover:bg-dark-500 text-white text-xs font-medium rounded-xl">关闭窗口</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Duplicate Warning Modal -->
+        <div id="duplicate-warning-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+            <div class="bg-dark-800 border border-red-500/50 rounded-2xl w-full max-w-md p-6 shadow-2xl text-center relative">
+                <div class="w-14 h-14 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center text-red-400 text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">手机号码重复拦截</h3>
+                <p class="text-sm text-gray-300 mb-4">系统检测到该手机号码已存在，无法重复录入！</p>
+                
+                <div class="bg-dark-700/80 p-4 rounded-xl border border-gray-600 text-left text-xs space-y-2 mb-6">
+                    <p class="text-gray-400">重复号码：<span id="dup-phone-val" class="font-mono text-white font-semibold"></span></p>
+                    <p class="text-gray-400">先前录入成员：<span id="dup-creator-val" class="text-indigo-300 font-semibold"></span></p>
+                    <p class="text-gray-400">所属组别：<span id="dup-group-val" class="text-gray-200"></span></p>
+                    <p class="text-gray-400">录入时间：<span id="dup-time-val" class="font-mono text-gray-200"></span></p>
+                </div>
+
+                <button onclick="closeDuplicateModal()" class="w-full py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-xl transition">我知道了</button>
+            </div>
+        </div>
+
+        <!-- Toast Notification Box -->
+        <div id="toast-notification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+            <div id="toast-content" class="px-5 py-3 rounded-xl shadow-2xl border text-sm font-medium flex items-center space-x-3">
+                <i id="toast-icon" class="fa-solid fa-circle-check text-lg"></i>
+                <span id="toast-message">操作成功提示</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        
+        // System Data Structures
+        let accounts = [];
+        let records = [];
+        let logs = [];
+        let channels = [];
+        let currentUser = null;
+
+        function initSystemData() {
+            // 1. Initialize Channels: FB1-20, TK1-20, 谷歌1-20, 其他
+            const defaultChannels = [];
+            for (let i = 1; i <= 20; i++) defaultChannels.push(`FB${i}`);
+            for (let i = 1; i <= 20; i++) defaultChannels.push(`TK${i}`);
+            for (let i = 1; i <= 20; i++) defaultChannels.push(`谷歌${i}`);
+            defaultChannels.push('其他');
+
+            channels = defaultChannels;
+            const savedChannels = localStorage.getItem('zf_system_channels');
+            if (savedChannels) {
+                try { channels = JSON.parse(savedChannels); } catch(e) {}
+            }
+
+            // 2. Initialize Accounts
+            // 管理001
+            accounts.push({ username: '管理001', role: 'admin', group: '管理层', password: '111111' });
+            
+            // 组长 A, B, C, D and Employees A1-A10, B1-B10, C1-C10, D1-D10
+            const groupsConfig = [
+                { leader: '组长A', prefix: 'A', groupName: '第A组' },
+                { leader: '组长B', prefix: 'B', groupName: '第B组' },
+                { leader: '组长C', prefix: 'C', groupName: '第C组' },
+                { leader: '组长D', prefix: 'D', groupName: '第D组' },
+            ];
+
+            groupsConfig.forEach(cfg => {
+                accounts.push({ username: cfg.leader, role: 'leader', group: cfg.groupName, password: '111111' });
+                for (let i = 1; i <= 10; i++) {
+                    accounts.push({ username: `${cfg.prefix}${i}`, role: 'employee', group: cfg.groupName, password: '111111' });
+                }
+            });
+
+            const savedAccounts = localStorage.getItem('zf_system_accounts');
+            if (savedAccounts) {
+                try { accounts = JSON.parse(savedAccounts); } catch(e) {}
+            }
+
+            // 3. Initialize Records
+            const savedRecords = localStorage.getItem('zf_system_records');
+            if (savedRecords) {
+                try { records = JSON.parse(savedRecords); } catch(e) {}
+            } else {
+                // Sample initial records
+                records = [
+                    { id: 101, customer: '张三', phone: '13800138000', channel: 'FB1', groupChat: '重粉群01', creator: 'A1', group: '第A组', time: '2026-06-01 10:20:00' },
+                    { id: 102, customer: '李四', phone: '13900139000', channel: 'TK2', groupChat: '重粉群02', creator: '组长A', group: '第A组', time: '2026-06-01 11:15:00' },
+                    { id: 103, customer: '王五', phone: '13700137000', channel: '谷歌3', groupChat: '重粉群03', creator: 'B1', group: '第B组', time: '2026-06-01 14:30:00' }
+                ];
+            }
+
+            // 4. Initialize Logs
+            const savedLogs = localStorage.getItem('zf_system_logs');
+            if (savedLogs) {
+                try { logs = JSON.parse(savedLogs); } catch(e) {}
+            }
+        }
+
+        function saveSystemData() {
+            localStorage.setItem('zf_system_channels', JSON.stringify(channels));
+            localStorage.setItem('zf_system_accounts', JSON.stringify(accounts));
+            localStorage.setItem('zf_system_records', JSON.stringify(records));
+            localStorage.setItem('zf_system_logs', JSON.stringify(logs));
+        }
+
+        function addLog(action, details) {
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            logs.unshift({
+                time: timeStr,
+                operator: currentUser ? currentUser.username : '系统',
+                action,
+                details
+            });
+            saveSystemData();
+        }
+
+
+        function populateLoginDropdown() {
+            const select = document.getElementById('login-account-select');
+            select.innerHTML = '<option value="" disabled selected>-- 请选择登录账号 --</option>';
+
+            // Admin group
+            const adminOptGroup = document.createElement('optgroup');
+            adminOptGroup.label = "管理层";
+            accounts.filter(a => a.role === 'admin').forEach(acc => {
+                const opt = document.createElement('option');
+                opt.value = acc.username;
+                opt.textContent = `${acc.username} (管理员)`;
+                adminOptGroup.appendChild(opt);
+            });
+            select.appendChild(adminOptGroup);
+
+            // Group Leaders & Employees
+            ['第A组', '第B组', '第C组', '第D组'].forEach(gName => {
+                const gOptGroup = document.createElement('optgroup');
+                gOptGroup.label = gName;
+
+                accounts.filter(a => a.group === gName).forEach(acc => {
+                    const opt = document.createElement('option');
+                    opt.value = acc.username;
+                    const roleLabel = acc.role === 'leader' ? '【组长】' : '【员工】';
+                    opt.textContent = `${acc.username} ${roleLabel}`;
+                    gOptGroup.appendChild(opt);
+                });
+                select.appendChild(gOptGroup);
+            });
+
+            // Remembered account
+            const remembered = localStorage.getItem('zf_remembered_account');
+            if (remembered) {
+                select.value = remembered;
+                document.getElementById('remember-me').checked = true;
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('login-password');
+            const icon = document.getElementById('toggle-pwd-icon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash text-sm';
+            } else {
+                pwdInput.type = 'password';
+                icon.className = 'fa-solid fa-eye text-sm';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-account-select').value;
+            const password = document.getElementById('login-password').value;
+            const remember = document.getElementById('remember-me').checked;
+
+            const account = accounts.find(a => a.username === username);
+            const errBox = document.getElementById('login-error');
+
+            if (!account || account.password !== password) {
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            errBox.classList.add('hidden');
+            currentUser = account;
+
+            if (remember) {
+                localStorage.setItem('zf_remembered_account', username);
+            } else {
+                localStorage.removeItem('zf_remembered_account');
+            }
+
+            sessionStorage.setItem('zf_current_user', JSON.stringify(currentUser));
+            transitionToMainApp();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('zf_current_user');
+            document.getElementById('main-interface').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-password').value = '111111';
+            populateLoginDropdown();
+        }
+
+        function transitionToMainApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-interface').classList.remove('hidden');
+
+            document.getElementById('nav-username').textContent = currentUser.username;
+            const roleBadge = document.getElementById('nav-role-badge');
+            
+            const entrySidebar = document.getElementById('employee-entry-sidebar');
+            const adminActionBtns = document.getElementById('admin-action-buttons');
+            const leaderActionBtns = document.getElementById('leader-action-buttons');
+            const tableActionHeader = document.getElementById('table-action-header');
+
+            if (currentUser.role === 'admin') {
+                roleBadge.textContent = '管理员 (管理001)';
+                roleBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-red-500/20 text-red-300 border border-red-500/30';
+                
+                entrySidebar.classList.add('hidden'); // 管理001不显示录入工作台
+                adminActionBtns.classList.remove('hidden');
+                leaderActionBtns.classList.add('hidden');
+                tableActionHeader.classList.remove('hidden');
+                document.getElementById('stat-scope-desc').textContent = '全局全量数据 (管理001视图)';
+            } else if (currentUser.role === 'leader') {
+                roleBadge.textContent = `组长 (${currentUser.group})`;
+                roleBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30';
+                
+                entrySidebar.classList.add('hidden'); // 组长不显示录入工作台
+                adminActionBtns.classList.add('hidden');
+                leaderActionBtns.classList.remove('hidden');
+                document.getElementById('leader-team-btn-text').textContent = `管理 ${currentUser.group} 名下员工`;
+                tableActionHeader.classList.add('hidden'); // 组长不可删除导出
+                document.getElementById('stat-scope-desc').textContent = `${currentUser.group} 所有员工数据总汇`;
+            } else {
+                roleBadge.textContent = `员工 (${currentUser.group})`;
+                roleBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
+                
+                entrySidebar.classList.remove('hidden'); // 员工显示录入工作台
+                adminActionBtns.classList.add('hidden');
+                leaderActionBtns.classList.add('hidden');
+                tableActionHeader.classList.add('hidden'); // 员工不可删除
+                document.getElementById('stat-scope-desc').textContent = '个人录入数据明细';
+
+                // Setup entry form defaults
+                document.getElementById('entry-creator').value = currentUser.username;
+                updateLiveEntryTime();
+                updateChannelSelectOptions();
+            }
+
+            renderStats();
+            renderDataTable();
+        }
+
+        function updateLiveEntryTime() {
+            if (!currentUser || currentUser.role !== 'employee') return;
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            document.getElementById('entry-time').value = timeStr;
+            setTimeout(updateLiveEntryTime, 1000);
+        }
+
+        function updateChannelSelectOptions() {
+            const select = document.getElementById('entry-channel');
+            select.innerHTML = '<option value="" disabled selected>-- 请选择渠道商 --</option>';
+            channels.forEach(ch => {
+                const opt = document.createElement('option');
+                opt.value = ch;
+                opt.textContent = ch;
+                select.appendChild(opt);
+            });
+        }
+
+
+        function getAccessibleRecords() {
+            if (!currentUser) return [];
+            if (currentUser.role === 'admin') {
+                return records;
+            } else if (currentUser.role === 'leader') {
+                return records.filter(r => r.group === currentUser.group);
+            } else {
+                return records.filter(r => r.creator === currentUser.username);
+            }
+        }
+
+        function renderStats() {
+            const accessible = getAccessibleRecords();
+            const totalCount = accessible.length;
+
+            // Today count
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            const todayCount = accessible.filter(r => r.time.startsWith(todayStr)).length;
+
+            document.getElementById('stat-today-count').textContent = todayCount;
+            document.getElementById('stat-total-count').textContent = totalCount;
+        }
+
+
+        function handleDataSubmit(event) {
+            event.preventDefault();
+            const customer = document.getElementById('entry-customer').value.trim();
+            const phone = document.getElementById('entry-phone').value.trim();
+            const channel = document.getElementById('entry-channel').value;
+            const groupChat = document.getElementById('entry-group-chat').value.trim();
+
+            if (!customer || !phone || !channel || !groupChat) {
+                showToast('请完整填写所有录入字段！', 'error');
+                return;
+            }
+
+            // Global duplicate check across all records
+            const existing = records.find(r => r.phone === phone);
+            if (existing) {
+                // Show duplicate warning modal with details
+                document.getElementById('dup-phone-val').textContent = phone;
+                document.getElementById('dup-creator-val').textContent = existing.creator;
+                document.getElementById('dup-group-val').textContent = existing.group;
+                document.getElementById('dup-time-val').textContent = existing.time;
+                document.getElementById('duplicate-warning-modal').classList.remove('hidden');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+
+            const newRecord = {
+                id: Date.now(),
+                customer,
+                phone,
+                channel,
+                groupChat,
+                creator: currentUser.username,
+                group: currentUser.group,
+                time: timeStr
+            };
+
+            records.unshift(newRecord);
+            saveSystemData();
+
+            // Reset form inputs except creator & time
+            document.getElementById('entry-customer').value = '';
+            document.getElementById('entry-phone').value = '';
+            document.getElementById('entry-group-chat').value = '';
+            document.getElementById('entry-channel').selectedIndex = 0;
+
+            renderStats();
+            renderDataTable();
+            showToast('数据提交成功！', 'success');
+        }
+
+        function closeDuplicateModal() {
+            document.getElementById('duplicate-warning-modal').classList.add('hidden');
+        }
+
+
+        function renderDataTable() {
+            const tbody = document.getElementById('data-table-body');
+            const emptyState = document.getElementById('table-empty-state');
+            const searchKeyword = document.getElementById('search-input').value.toLowerCase();
+
+            const accessible = getAccessibleRecords();
+            const filtered = accessible.filter(r => 
+                r.customer.toLowerCase().includes(searchKeyword) ||
+                r.phone.toLowerCase().includes(searchKeyword) ||
+                r.channel.toLowerCase().includes(searchKeyword) ||
+                r.groupChat.toLowerCase().includes(searchKeyword) ||
+                r.creator.toLowerCase().includes(searchKeyword)
+            );
+
+            tbody.innerHTML = '';
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            filtered.forEach((r, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-dark-700/40 transition';
+
+                let actionHtml = '';
+                if (currentUser.role === 'admin') {
+                    actionHtml = `<td class="py-3 px-4 text-right"><button onclick="deleteRecord(${r.id})" class="px-2.5 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded border border-red-500/30 transition"><i class="fa-solid fa-trash"></i> 删除</button></td>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-xs font-mono text-gray-400">${idx + 1}</td>
+                    <td class="py-3 px-4 font-medium text-white">${escapeHtml(r.customer)}</td>
+                    <td class="py-3 px-4 font-mono text-indigo-300 font-semibold">${escapeHtml(r.phone)}</td>
+                    <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">${escapeHtml(r.channel)}</span></td>
+                    <td class="py-3 px-4 text-xs text-gray-300">${escapeHtml(r.groupChat)}</td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs bg-dark-700 text-gray-300 border border-gray-600">${escapeHtml(r.creator)}</span></td>
+                    <td class="py-3 px-4 text-xs text-gray-400">${escapeHtml(r.group)}</td>
+                    <td class="py-3 px-4 text-xs text-gray-400 font-mono">${escapeHtml(r.time)}</td>
+                    ${currentUser.role === 'admin' ? actionHtml : ''}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteRecord(id) {
+            if (confirm('确定要永久删除这条数据记录吗？')) {
+                const rec = records.find(r => r.id === id);
+                records = records.filter(r => r.id !== id);
+                saveSystemData();
+                addLog('删除数据', `管理员删除了客户 [${rec ? rec.customer : id}] 的录入记录`);
+                renderStats();
+                renderDataTable();
+                showToast('数据记录已删除。', 'success');
+            }
+        }
+
+
+        // ================= ADMIN & LEADER MANAGEMENT MODALS =================
+
+        // 1. Channel Manager
+        function openChannelManagerModal() {
+            renderChannelList();
+            document.getElementById('channel-manager-modal').classList.remove('hidden');
+        }
+        function closeChannelManagerModal() {
+            document.getElementById('channel-manager-modal').classList.add('hidden');
+        }
+        function renderChannelList() {
+            const container = document.getElementById('channel-list-container');
+            container.innerHTML = '';
+            channels.forEach((ch, idx) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-dark-700 px-3 py-2 rounded-xl border border-gray-600 text-xs';
+                item.innerHTML = `
+                    <span class="font-semibold text-white">${escapeHtml(ch)}</span>
+                    <button onclick="removeChannel(${idx})" class="text-red-400 hover:text-red-300 px-1.5 py-0.5"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                container.appendChild(item);
+            });
+        }
+        function handleAddNewChannel(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-channel-name').value.trim();
+            if (!name) return;
+            if (channels.includes(name)) {
+                showToast('该渠道商已存在！', 'error');
+                return;
+            }
+            channels.push(name);
+            saveSystemData();
+            addLog('添加渠道商', `管理员添加了新渠道商: ${name}`);
+            document.getElementById('new-channel-name').value = '';
+            renderChannelList();
+            showToast('渠道商添加成功，全系统已实时同步！', 'success');
+        }
+        function removeChannel(idx) {
+            if (channels.length <= 1) {
+                showToast('至少需保留一个渠道商！', 'error');
+                return;
+            }
+            const removed = channels.splice(idx, 1)[0];
+            saveSystemData();
+            addLog('删除渠道商', `管理员删除了渠道商: ${removed}`);
+            renderChannelList();
+            showToast('渠道商已删除。', 'success');
+        }
+
+        // 2. Logs Modal
+        function openLogsModal() {
+            renderLogsList();
+            document.getElementById('logs-modal').classList.remove('hidden');
+        }
+        function closeLogsModal() {
+            document.getElementById('logs-modal').classList.add('hidden');
+        }
+        function renderLogsList() {
+            const container = document.getElementById('logs-list-container');
+            const emptyState = document.getElementById('logs-empty-state');
+            container.innerHTML = '';
+
+            if (logs.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            logs.forEach(log => {
+                const card = document.createElement('div');
+                card.className = 'bg-dark-700/60 border border-gray-600/60 rounded-xl p-3.5 text-xs space-y-1';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-gray-400 font-mono">
+                        <span class="text-indigo-400 font-semibold"><i class="fa-solid fa-user-gear"></i> 操作人: ${escapeHtml(log.operator)}</span>
+                        <span>${escapeHtml(log.time)}</span>
+                    </div>
+                    <p class="text-white font-medium">动作: <span class="text-purple-300">${escapeHtml(log.action)}</span></p>
+                    <p class="text-gray-300">详情: ${escapeHtml(log.details)}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 3. Account Manager (Admin)
+        function openAccountManagerModal() {
+            renderAdminAccountGrid();
+            document.getElementById('account-manager-modal').classList.remove('hidden');
+        }
+        function closeAccountManagerModal() {
+            document.getElementById('account-manager-modal').classList.add('hidden');
+        }
+        function renderAdminAccountGrid() {
+            const grid = document.getElementById('admin-account-list-grid');
+            grid.innerHTML = '';
+
+            accounts.forEach(acc => {
+                const card = document.createElement('div');
+                card.className = 'bg-dark-700/60 border border-gray-600/60 rounded-xl p-4 flex flex-col justify-between space-y-3';
+                
+                let roleColor = 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20';
+                let roleText = '员工';
+                if (acc.role === 'admin') { roleColor = 'text-red-400 bg-red-500/10 border-red-500/20'; roleText = '管理员'; }
+                else if (acc.role === 'leader') { roleColor = 'text-purple-400 bg-purple-500/10 border-purple-500/20'; roleText = '组长'; }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white text-sm">${escapeHtml(acc.username)}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${roleColor}">${roleText}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-1">所属组别: ${escapeHtml(acc.group)}</p>
+                        <p class="text-xs text-gray-400 font-mono mb-2">当前密码: <span class="text-gray-200">${escapeHtml(acc.password)}</span></p>
+                        
+                        <div class="flex items-center space-x-2 mt-2">
+                            <input type="text" id="rename-input-${acc.username}" value="${acc.username}" class="w-full px-2.5 py-1 bg-dark-900 border border-gray-600 rounded text-xs text-white" placeholder="新账号名">
+                            <button onclick="renameAccount('${acc.username}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded transition shrink-0">改名</button>
+                        </div>
+                    </div>
+                    <button onclick="resetAccountPasswordByAdmin('${acc.username}')" class="w-full py-1.5 bg-dark-600 hover:bg-dark-500 text-gray-200 text-xs font-medium rounded-lg border border-gray-500/40 transition">
+                        重置密码为 111111
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        function handleAddNewAccount(e) {
+            e.preventDefault();
+            const role = document.getElementById('new-acc-role').value;
+            const group = document.getElementById('new-acc-group').value;
+            const username = document.getElementById('new-acc-username').value.trim();
+
+            if (!username) return;
+            if (accounts.some(a => a.username === username)) {
+                showToast('该账号名称已存在！', 'error');
+                return;
+            }
+
+            accounts.push({
+                username,
+                role,
+                group,
+                password: '111111'
+            });
+            saveSystemData();
+            addLog('添加账号', `管理员添加了新${role === 'leader' ? '组长' : '员工'}账号: ${username} (${group})`);
+            document.getElementById('new-acc-username').value = '';
+            renderAdminAccountGrid();
+            showToast('新账号添加成功！', 'success');
+        }
+        function renameAccount(oldName) {
+            const inputVal = document.getElementById(`rename-input-${oldName}`).value.trim();
+            if (!inputVal || inputVal === oldName) return;
+            if (accounts.some(a => a.username === inputVal)) {
+                showToast('该账号名称已被占用！', 'error');
+                return;
+            }
+            const acc = accounts.find(a => a.username === oldName);
+            if (acc) {
+                acc.username = inputVal;
+                // Update records creator name
+                records.forEach(r => {
+                    if (r.creator === oldName) r.creator = inputVal;
+                });
+                saveSystemData();
+                addLog('修改账号名', `管理员将账号 [${oldName}] 修改为 [${inputVal}]`);
+                renderAdminAccountGrid();
+                showToast('账号名称修改成功！', 'success');
+            }
+        }
+        function resetAccountPasswordByAdmin(username) {
+            const acc = accounts.find(a => a.username === username);
+            if (acc) {
+                acc.password = '111111';
+                saveSystemData();
+                addLog('重置密码', `管理员重置了账号 [${username}] 的密码为 111111`);
+                renderAdminAccountGrid();
+                showToast(`账号 [${username}] 密码已重置为 111111`, 'success');
+            }
+        }
+
+        // 4. Team Manager (Leader)
+        function openTeamManagerModal() {
+            renderTeamMembersList();
+            document.getElementById('team-manager-modal').classList.remove('hidden');
+        }
+        function closeTeamManagerModal() {
+            document.getElementById('team-manager-modal').classList.add('hidden');
+        }
+        function renderTeamMembersList() {
+            const container = document.getElementById('team-members-list-container');
+            container.innerHTML = '';
+
+            const members = accounts.filter(a => a.group === currentUser.group && a.role === 'employee');
+            document.getElementById('team-modal-title').innerHTML = `<i class="fa-solid fa-users text-purple-400"></i> <span>${currentUser.group} 名下员工管理 (共 ${members.length} 人)</span>`;
+
+            members.forEach(emp => {
+                const card = document.createElement('div');
+                card.className = 'bg-dark-700/60 border border-gray-600/60 rounded-xl p-4 flex items-center justify-between';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="font-bold text-white text-sm">${escapeHtml(emp.username)}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">员工</span>
+                        </div>
+                        <p class="text-xs text-gray-400 font-mono">当前密码: ${escapeHtml(emp.password)}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="leader-rename-${emp.username}" value="${emp.username}" class="w-28 px-2 py-1 bg-dark-900 border border-gray-600 rounded text-xs text-white">
+                        <button onclick="leaderRenameEmployee('${emp.username}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded transition">改名</button>
+                        <button onclick="leaderResetEmpPwd('${emp.username}')" class="px-3 py-1 bg-dark-600 hover:bg-dark-500 text-gray-200 text-xs rounded border border-gray-500/40 transition">重置密码</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        function leaderRenameEmployee(oldName) {
+            const newName = document.getElementById(`leader-rename-${oldName}`).value.trim();
+            if (!newName || newName === oldName) return;
+            if (accounts.some(a => a.username === newName)) {
+                showToast('该账号名已被占用！', 'error');
+                return;
+            }
+            const emp = accounts.find(a => a.username === oldName);
+            if (emp) {
+                emp.username = newName;
+                records.forEach(r => {
+                    if (r.creator === oldName) r.creator = newName;
+                });
+                saveSystemData();
+                renderTeamMembersList();
+                showToast('员工名字修改成功！', 'success');
+            }
+        }
+        function leaderResetEmpPwd(username) {
+            const emp = accounts.find(a => a.username === username);
+            if (emp) {
+                emp.password = '111111';
+                saveSystemData();
+                renderTeamMembersList();
+                showToast(`员工 [${username}] 密码已重置为 111111`, 'success');
+            }
+        }
+
+
+        // ================= CHANGE PASSWORD (SELF) & EXPORT =================
+
+        function openChangePasswordModal() {
+            document.getElementById('new-password-input').value = '';
+            document.getElementById('confirm-password-input').value = '';
+            document.getElementById('password-modal').classList.remove('hidden');
+        }
+        function closeChangePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+        }
+        function handlePasswordChangeSubmit(event) {
+            event.preventDefault();
+            const p1 = document.getElementById('new-password-input').value;
+            const p2 = document.getElementById('confirm-password-input').value;
+
+            if (p1 !== p2) {
+                showToast('两次输入的密码不一致！', 'error');
+                return;
+            }
+
+            const target = accounts.find(a => a.username === currentUser.username);
+            if (target) {
+                target.password = p1;
+                saveSystemData();
+                closeChangePasswordModal();
+                showToast('本人密码修改成功！', 'success');
+            }
+        }
+
+        // Export Data (Admin Only)
+        function exportDataToCSV() {
+            const accessible = getAccessibleRecords();
+            if (accessible.length === 0) {
+                showToast('暂无数据可供导出！', 'error');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "序号,客户名称,手机号码,渠道商,所属群,录入员工,所属组别,录入时间\r\n";
+
+            accessible.forEach((r, idx) => {
+                csvContent += `${idx+1},"${r.customer}","${r.phone}","${r.channel}","${r.groupChat}","${r.creator}","${r.group}","${r.time}"\r\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `重粉数据导出_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            addLog('导出数据', `管理员导出了 ${accessible.length} 条数据记录`);
+            showToast('数据导出成功！', 'success');
+        }
+
+
+        // Toast Notification Helper
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const content = document.getElementById('toast-content');
+            const icon = document.getElementById('toast-icon');
+            const msgSpan = document.getElementById('toast-message');
+
+            msgSpan.textContent = message;
+            if (type === 'success') {
+                content.className = 'px-5 py-3 rounded-xl shadow-2xl border bg-dark-800 border-indigo-500/40 text-indigo-300 flex items-center space-x-3';
+                icon.className = 'fa-solid fa-circle-check text-indigo-400 text-lg';
+            } else {
+                content.className = 'px-5 py-3 rounded-xl shadow-2xl border bg-dark-800 border-red-500/40 text-red-300 flex items-center space-x-3';
+                icon.className = 'fa-solid fa-triangle-exclamation text-red-400 text-lg';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Window Onload Initialization
+        window.onload = function() {
+            initSystemData();
+            populateLoginDropdown();
+
+            const activeSession = sessionStorage.getItem('zf_current_user');
+            if (activeSession) {
+                try {
+                    currentUser = JSON.parse(activeSession);
+                    transitionToMainApp();
+                } catch(e) {}
+            }
+        };
+    </script>
+</body>
+</html>
