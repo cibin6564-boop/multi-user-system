@@ -747,9 +747,16 @@
         }
 
 
-        function getAccessibleRecords() {
+      function getAccessibleRecords() {
     if (!currentUser) return [];
-    return records;
+
+    // 管理员可以查看全部数据
+    if (currentUser.role === 'admin') {
+        return records;
+    }
+
+    // 组长和员工只能查看自己所在组的数据
+    return records.filter(r => r.group === currentUser.group);
 }
 
         function renderStats() {
